@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="styles.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>Music App</h1>
+    <div class="music-container">
+        <div class="music-info">
+            <h4 class="titel">Ukulele</h4>
+            <div class="progress-container">
+                <div class="progress"></div>
+            </div>
+        </div>
+        <audio src="" id="audio"></audio>
+        <div class="img-container">
+            <img src="/Users/love/Desktop/myleaf/music-app-js/images/zambala.jpeg" alt="music-cover" id="cover">
+        </div>
+        <div class="navi">
+            <button class="action-btn" id="prev">
+                <i class="fas fa-backward"></i>
+            </button>
+            <button class="action-btn action-btn-big" id="play">
+                <i class="fas fa-play"></i>
+            </button>
+            <button class="action-btn" id="next">
+                <i class="fas fa-forward"></i>
+            </button>
+        </div>
+    </div>
+</body>
+<script>
+
+    const playbtn = document.querySelector('#play');
+    const prevbtn = document.querySelector('#prev');
+    const nextbtn = document.querySelector('#next');
+    const audio = document.querySelector('#audio');
+    const songTitle = document.querySelector('.titel');
+    const coverImg = document.querySelector('#cover');
+    const musicInfo = document.querySelector('.music-info');
+    const musicContainer = document.querySelector('.music-container');
+    const progress = document.querySelector('.progress');
+    const progressContainer = document.querySelector('.progress-container');
+
+    const songs = ['https://api.soundcloud.com/tracks/1317707533/stream', 'mezamba'];
+
+    // keeping track of the songs via index
+    let songIndex = 0;
+
+    // loading songs into the DOM
+
+    loadSong(songs[songIndex]);
+
+    function loadSong(song) {
+        songTitle.innerText = song;
+        audio.src = `sounds/${song}.mp3`;
+        coverImg.src = `/Users/love/Desktop/myleaf/music-app-js/images/${song}.jpeg`;
+    }
+
+
+    function playSong(event) {
+        // document.querySelector('h1').innerHTML = "Hello World";
+        coverImg.classList.add('animation-active');
+        musicInfo.classList.add('music-info-playing');
+        playbtn.querySelector('i.fas').classList.remove('fa-play');
+        playbtn.querySelector('i.fas').classList.add('fa-pause');
+        audio.play();
+    }
+
+    function pauseSong(event) {
+        coverImg.classList.remove('animation-active');
+        musicInfo.classList.remove('music-info-playing');
+        playbtn.querySelector('i.fas').classList.remove('fa-pause');
+        playbtn.querySelector('i.fas').classList.add('fa-play');
+        audio.pause()
+    }
+
+
+    playbtn.addEventListener('click', () => {
+        const isPlaying = musicInfo.classList.contains('music-info-playing') && coverImg.classList.contains('animation-active');
+
+        if (isPlaying) {
+            pauseSong();
+            console.log('is paused!!!')
+
+        }
+
+        else if (!isPlaying) {
+            playSong();
+            console.log('is  playing!!!')
+        }
+
+    });
+
+    function prevSong() {
+        console.log("prev song is clicked!");
+        songIndex--
+
+        if (songIndex < 0) {
+            songIndex = songs.length - 1
+        }
+        loadSong(songs[songIndex]);
+        playSong();
+    }
+
+    function nextSong() {
+        console.log("nextsong is clicked!")
+        songIndex++
+        if (songIndex > songs.length - 1) {
+            songIndex = 0;
+        }
+        loadSong(songs[songIndex]);
+        playSong();
+    }
+
+    function updateProgress(event) {
+        const { currentTime, duration } = event.srcElement
+        progress.style.width = `${(currentTime / duration) * 100}%`;
+    }
+
+    function setProgress(event) {
+        const width = this.clientWidth;
+        const clickX = event.offsetX;
+        const duration = audio.duration;
+
+        console.log(duration)
+        console.log(width);
+
+        audio.currentTime = (clickX / width) * duration;
+
+    }
+
+    prevbtn.addEventListener('click', prevSong);
+    nextbtn.addEventListener('click', nextSong);
+    audio.addEventListener('timeupdate', updateProgress)
+    progressContainer.addEventListener('click', setProgress);
+    audio.addEventListener('ended', nextSong);
+
+</script>
+
+</html>
